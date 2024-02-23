@@ -1,0 +1,298 @@
+version: "3.7"
+
+x-minio-common: &minio-common
+  image: quay.io/minio/minio:RELEASE.2024-02-09T21-25-16Z-cpuv1
+  user: root
+  expose:
+    - "9000"
+    - "9005"
+  # environment:
+  # MINIO_ROOT_USER: minioadmin
+  # MINIO_ROOT_PASSWORD: minioadmin
+  healthcheck:
+    test: ["CMD", "mc", "ready", "local"]
+    interval: 5s
+    timeout: 5s
+    retries: 5
+
+x-minio-common-4: &minio-common-4
+  <<: *minio-common
+  command: server --console-address ":9005" http://minio-4-{1...4}/data{1...2}
+x-minio-common-2: &minio-common-2
+  <<: *minio-common
+  command: server --console-address ":9005" http://minio-2-{1...2}/data{1...2}
+x-minio-common-1: &minio-common-1
+  <<: *minio-common
+  command: server --console-address ":9005" http://minio-1-1/data{1...2}
+
+x-bob-common: &bob-common
+  image: qoollo/bob:2.1.0.alpha.12
+  user: root
+  expose:
+    - "8000"
+    - "22"
+  security_opt:
+    - "seccomp:./profile.json"
+ # ulimits:
+  #  memlock: 4194304
+
+services:
+  # 4-minio1:
+  #   <<: *minio-common-4
+  #   hostname: minio-41
+  #   volumes:
+  #     - ./minio_data/4-data1-1:/data1
+  #     - ./minio_data/4-data1-2:/data2
+  #
+  # 4-minio2:
+  #   <<: *minio-common-4
+  #   hostname: minio-42
+  #   volumes:
+  #     - ./minio_data/4-data2-1:/data1
+  #     - ./minio_data/4-data2-2:/data2
+  #
+  # 4-minio3:
+  #   <<: *minio-common-4
+  #   hostname: minio-43
+  #   volumes:
+  #     - ./minio_data/4-data3-1:/data1
+  #     - ./minio_data/4-data3-2:/data2
+  #
+  # 4-minio4:
+  #   <<: *minio-common-4
+  #   hostname: minio-44
+  #   volumes:
+  #     - ./minio_data/4-data4-1:/data1
+  #     - ./minio_data/4-data4-2:/data2
+
+  2-minio1:
+    <<: *minio-common-2
+    hostname: minio-2-1
+    volumes:
+      - ./minio_data/2-data1-1:/data1
+      - ./minio_data/2-data1-2:/data2
+
+  2-minio2:
+    <<: *minio-common-2
+    hostname: minio-2-2
+    volumes:
+      - ./minio_data/2-data2-1:/data1
+      - ./minio_data/2-data2-2:/data2
+
+  1-minio1:
+    <<: *minio-common-1
+    hostname: minio-1-1
+    volumes:
+      - ./minio_data/1-data1-1:/data1
+      - ./minio_data/1-data1-2:/data2
+
+  nginx:
+    image: nginx:1.19.2-alpine
+    hostname: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "9000:9000"
+      - "9002:9002"
+      - "9005:9005"
+      - "9003:9003"
+    depends_on:
+      - 1-minio1
+      - 2-minio1
+      - 2-minio2
+      # - 4-minio1
+      # - 4-minio2
+      # - 4-minio3
+      # - 4-minio4
+
+  4-bob1:
+    <<: *bob-common
+    volumes:
+      - "./bob_data/:/tmp"
+      - "./configs:/bob/configs"
+      - "./bob_data/4_node_1/data/:/bob/data"
+      - "./bob_data/4_node_1/log/:/bob/log"
+    command: "4_cluster.yaml 4_node_1.yaml --init_folders"
+    networks:
+      bobnet:
+        ipv4_address: 192.168.17.11
+
+  4-bob2:
+    <<: *bob-common
+    volumes:
+      - "./bob_data/:/tmp"
+      - "./configs:/bob/configs"
+      - "./bob_data/4_node_2/data/:/bob/data"
+      - "./bob_data/4_node_2/log/:/bob/log"
+    command: "4_cluster.yaml 4_node_2.yaml --init_folders"
+    networks:
+      bobnet:
+        ipv4_address: 192.168.17.12
+
+  4-bob3:
+    <<: *bob-common
+    volumes:
+      - "./bob_data/:/tmp"
+      - "./configs:/bob/configs"
+      - "./bob_data/4_node_3/data/:/bob/data"
+      - "./bob_data/4_node_3/log/:/bob/log"
+    command: "4_cluster.yaml 4_node_3.yaml --init_folders"
+    networks:
+      bobnet:
+        ipv4_address: 192.168.17.13
+
+  4-bob4:
+    <<: *bob-common
+    volumes:
+      - "./bob_data/:/tmp"
+      - "./configs:/bob/configs"
+      - "./bob_data/4_node_4/data/:/bob/data"
+      - "./bob_data/4_node_4/log/:/bob/log"
+    command: "4_cluster.yaml 4_node_4.yaml --init_folders"
+    networks:
+      bobnet:
+        ipv4_address: 192.168.17.14
+
+  2-bob1:
+    <<: *bob-common
+    volumes:
+      - "./bob_data/:/tmp"
+      - "./configs:/bob/configs"
+      - "./bob_data/2_node_1/data/:/bob/data"
+      - "./bob_data/2_node_1/log/:/bob/log"
+    command: "2_cluster.yaml 2_node_1.yaml --init_folders"
+    networks:
+      bobnet:
+        ipv4_address: 192.168.17.15
+
+  2-bob2:
+    <<: *bob-common
+    volumes:
+      - "./bob_data/:/tmp"
+      - "./configs:/bob/configs"
+      - "./bob_data/2_node_2/data/:/bob/data"
+      - "./bob_data/2_node_2/log/:/bob/log"
+    command: "2_cluster.yaml 2_node_2.yaml --init_folders"
+    networks:
+      bobnet:
+        ipv4_address: 192.168.17.16
+
+  1-bob1:
+    <<: *bob-common
+    volumes:
+      - "./bob_data/:/tmp"
+      - "./configs:/bob/configs"
+      - "./bob_data/1_node_1/data/:/bob/data"
+      - "./bob_data/1_node_1/log/:/bob/log"
+    command: "1_cluster.yaml 1_node_1.yaml --init_folders"
+    networks:
+      bobnet:
+        ipv4_address: 192.168.17.17
+
+ # 1-oio-node1:
+   # build:
+   #   context: ./oiosds/products/sds-1/
+   #   dockerfile: df-centos7
+   # image: centos7:systemd
+  #  image: openio/sds
+  #  container_name: node1
+  #  hostname: node1
+  #  networks:
+  #    openio:
+  #      ipv4_address: 172.28.0.2
+  #  volumes:
+  #    - "/sys/fs/cgroup:/sys/fs/cgroup"
+  #    - "./oiosds-data/1-oio-node1/metadata-level0:/var/lib/oio/sds/OPENIO/meta0-0"
+  #    - "./oiosds-data/1-oio-node1/metadata-level1:/var/lib/oio/sds/OPENIO/meta1-0"
+  #    - "./oiosds-data/1-oio-node1/metadata-level2:/var/lib/oio/sds/OPENIO/meta2-0"
+  #    - "./oiosds-data/1-oio-node1/accounting:/var/lib/oio/sds/OPENIO/redis-0"
+  #    - "./oiosds-data/1-oio-node1/data:/var/lib/oio/sds/OPENIO/rawx-0"
+  #  privileged: true
+  #  command: /usr/lib/systemd/systemd
+
+ # 2-oio-node1:
+   # build:
+   #   context: ./oiosds/products/sds-2/
+   #   dockerfile: df-centos7
+   # image: centos7:systemd
+  #  image: openio/sds
+   # container_name: node2
+   # hostname: node2
+   # expose:
+   #   - "6007"
+   # networks:
+   #   openio:
+   #     ipv4_address: 172.28.0.3
+   # volumes:
+   #   - "/sys/fs/cgroup:/sys/fs/cgroup"
+   #   - "./oiosds-data/2-oio-node1/metadata-level0:/var/lib/oio/sds/OPENIO/meta0-0"
+   #   - "./oiosds-data/2-oio-node1/metadata-level1:/var/lib/oio/sds/OPENIO/meta1-0"
+   #   - "./oiosds-data/2-oio-node1/metadata-level2:/var/lib/oio/sds/OPENIO/meta2-0"
+   #   - "./oiosds-data/2-oio-node1/accounting:/var/lib/oio/sds/OPENIO/redis-0"
+   #   - "./oiosds-data/2-oio-node1/data:/var/lib/oio/sds/OPENIO/rawx-0"
+   # privileged: true
+   # command: /usr/lib/systemd/systemd
+
+  #2-oio-node2:
+   # build:
+   #   context: ./oiosds/products/sds-2/
+   #   dockerfile: df-centos7
+   # image: centos7:systemd
+   # image: openio/sds
+   # container_name: node3
+   # hostname: node3
+   # expose:
+   #   - "6007"
+   # networks:
+   #   openio:
+   #     ipv4_address: 172.28.0.4
+    #volumes:
+    #  - "/sys/fs/cgroup:/sys/fs/cgroup"
+    #  - "./oiosds-data/2-oio-node2/metadata-level0:/var/lib/oio/sds/OPENIO/meta0-0"
+    #  - "./oiosds-data/2-oio-node2/metadata-level1:/var/lib/oio/sds/OPENIO/meta1-0"
+    #  - "./oiosds-data/2-oio-node2/metadata-level2:/var/lib/oio/sds/OPENIO/meta2-0"
+    #  - "./oiosds-data/2-oio-node2/accounting:/var/lib/oio/sds/OPENIO/redis-0"
+    #  - "./oiosds-data/2-oio-node2/data:/var/lib/oio/sds/OPENIO/rawx-0" 
+   # privileged: true
+   # command: /usr/lib/systemd/systemd
+
+  #node4:
+  #  image: centos7:systemd
+  #  container_name: node4
+  #  hostname: node4
+  #  networks:
+  #    openio:
+  #      ipv4_address: 172.28.0.5
+  #  privileged: true
+  #  command: /usr/lib/systemd/systemd
+  #  volumes:
+  #    - "/sys/fs/cgroup:/sys/fs/cgroup"
+
+networks:
+  bobnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.17.0/24
+  openio:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+## By default this config uses default local driver,
+## For custom volumes replace with volume driver configuration.
+volumes:
+  4-data1-1:
+  4-data1-2:
+  4-data2-1:
+  4-data2-2:
+  4-data3-1:
+  4-data3-2:
+  4-data4-1:
+  4-data4-2:
+  2-data1-1:
+  2-data1-2:
+  2-data2-1:
+  2-data2-2:
+  1-data1-1:
+  1-data1-2:

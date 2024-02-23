@@ -1,0 +1,39 @@
+---
+nodes:
+  - name: node_1
+    address: "192.168.17.11:20000"
+    disks:
+      - name: d1
+        path: /tmp/4_node_1/data/d1
+  - name: node_2
+    address: "192.168.17.12:20000"
+    disks:
+      - name: d1
+        path: /tmp/4_node_2/data/d1
+  - name: node_3
+    address: "192.168.17.13:20000"
+    disks:
+      - name: d1
+        path: /tmp/4_node_3/data/d1
+  - name: node_4
+    address: "192.168.17.14:20000"
+    disks:
+      - name: d1
+        path: /tmp/4_node_4/data/d1
+vdisks:
+  - id: 0
+    replicas:
+      - node: node_1
+        disk: d1
+  - id: 1
+    replicas:
+      - node: node_2
+        disk: d1
+  - id: 2
+    replicas:
+      - node: node_3
+        disk: d1
+  - id: 3
+    replicas:
+      - node: node_4
+        disk: d1
