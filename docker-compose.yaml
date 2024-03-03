@@ -33,7 +33,7 @@ x-bob-common: &bob-common
     - "22"
   security_opt:
     - "seccomp:./profile.json"
- # ulimits:
+  # ulimits:
   #  memlock: 4194304
 
 services:
@@ -189,11 +189,11 @@ services:
       bobnet:
         ipv4_address: 192.168.17.17
 
- # 1-oio-node1:
-   # build:
-   #   context: ./oiosds/products/sds-1/
-   #   dockerfile: df-centos7
-   # image: centos7:systemd
+  # 1-oio-node1:
+  # build:
+  #   context: ./oiosds/products/sds-1/
+  #   dockerfile: df-centos7
+  # image: centos7:systemd
   #  image: openio/sds
   #  container_name: node1
   #  hostname: node1
@@ -210,51 +210,51 @@ services:
   #  privileged: true
   #  command: /usr/lib/systemd/systemd
 
- # 2-oio-node1:
-   # build:
-   #   context: ./oiosds/products/sds-2/
-   #   dockerfile: df-centos7
-   # image: centos7:systemd
+  # 2-oio-node1:
+  # build:
+  #   context: ./oiosds/products/sds-2/
+  #   dockerfile: df-centos7
+  # image: centos7:systemd
   #  image: openio/sds
-   # container_name: node2
-   # hostname: node2
-   # expose:
-   #   - "6007"
-   # networks:
-   #   openio:
-   #     ipv4_address: 172.28.0.3
-   # volumes:
-   #   - "/sys/fs/cgroup:/sys/fs/cgroup"
-   #   - "./oiosds-data/2-oio-node1/metadata-level0:/var/lib/oio/sds/OPENIO/meta0-0"
-   #   - "./oiosds-data/2-oio-node1/metadata-level1:/var/lib/oio/sds/OPENIO/meta1-0"
-   #   - "./oiosds-data/2-oio-node1/metadata-level2:/var/lib/oio/sds/OPENIO/meta2-0"
-   #   - "./oiosds-data/2-oio-node1/accounting:/var/lib/oio/sds/OPENIO/redis-0"
-   #   - "./oiosds-data/2-oio-node1/data:/var/lib/oio/sds/OPENIO/rawx-0"
-   # privileged: true
-   # command: /usr/lib/systemd/systemd
+  # container_name: node2
+  # hostname: node2
+  # expose:
+  #   - "6007"
+  # networks:
+  #   openio:
+  #     ipv4_address: 172.28.0.3
+  # volumes:
+  #   - "/sys/fs/cgroup:/sys/fs/cgroup"
+  #   - "./oiosds-data/2-oio-node1/metadata-level0:/var/lib/oio/sds/OPENIO/meta0-0"
+  #   - "./oiosds-data/2-oio-node1/metadata-level1:/var/lib/oio/sds/OPENIO/meta1-0"
+  #   - "./oiosds-data/2-oio-node1/metadata-level2:/var/lib/oio/sds/OPENIO/meta2-0"
+  #   - "./oiosds-data/2-oio-node1/accounting:/var/lib/oio/sds/OPENIO/redis-0"
+  #   - "./oiosds-data/2-oio-node1/data:/var/lib/oio/sds/OPENIO/rawx-0"
+  # privileged: true
+  # command: /usr/lib/systemd/systemd
 
   #2-oio-node2:
-   # build:
-   #   context: ./oiosds/products/sds-2/
-   #   dockerfile: df-centos7
-   # image: centos7:systemd
-   # image: openio/sds
-   # container_name: node3
-   # hostname: node3
-   # expose:
-   #   - "6007"
-   # networks:
-   #   openio:
-   #     ipv4_address: 172.28.0.4
-    #volumes:
-    #  - "/sys/fs/cgroup:/sys/fs/cgroup"
-    #  - "./oiosds-data/2-oio-node2/metadata-level0:/var/lib/oio/sds/OPENIO/meta0-0"
-    #  - "./oiosds-data/2-oio-node2/metadata-level1:/var/lib/oio/sds/OPENIO/meta1-0"
-    #  - "./oiosds-data/2-oio-node2/metadata-level2:/var/lib/oio/sds/OPENIO/meta2-0"
-    #  - "./oiosds-data/2-oio-node2/accounting:/var/lib/oio/sds/OPENIO/redis-0"
-    #  - "./oiosds-data/2-oio-node2/data:/var/lib/oio/sds/OPENIO/rawx-0" 
-   # privileged: true
-   # command: /usr/lib/systemd/systemd
+  # build:
+  #   context: ./oiosds/products/sds-2/
+  #   dockerfile: df-centos7
+  # image: centos7:systemd
+  # image: openio/sds
+  # container_name: node3
+  # hostname: node3
+  # expose:
+  #   - "6007"
+  # networks:
+  #   openio:
+  #     ipv4_address: 172.28.0.4
+  #volumes:
+  #  - "/sys/fs/cgroup:/sys/fs/cgroup"
+  #  - "./oiosds-data/2-oio-node2/metadata-level0:/var/lib/oio/sds/OPENIO/meta0-0"
+  #  - "./oiosds-data/2-oio-node2/metadata-level1:/var/lib/oio/sds/OPENIO/meta1-0"
+  #  - "./oiosds-data/2-oio-node2/metadata-level2:/var/lib/oio/sds/OPENIO/meta2-0"
+  #  - "./oiosds-data/2-oio-node2/accounting:/var/lib/oio/sds/OPENIO/redis-0"
+  #  - "./oiosds-data/2-oio-node2/data:/var/lib/oio/sds/OPENIO/rawx-0"
+  # privileged: true
+  # command: /usr/lib/systemd/systemd
 
   #node4:
   #  image: centos7:systemd

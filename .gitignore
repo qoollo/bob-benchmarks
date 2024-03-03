@@ -1,2 +1,6 @@
 /target
 Cargo.lock
+bob_data
+minio_data
+/pres
+styles
